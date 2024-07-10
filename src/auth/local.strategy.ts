@@ -22,6 +22,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         Promise<any> {
         const user = await this.userRepository.findOne({ where: { username } });
 
+        this.logger.debug(`username ${username} and password ${password}`);
+
         if (!user) {
             this.logger.debug(`User ${username} not found.`);
             throw new UnauthorizedException();
