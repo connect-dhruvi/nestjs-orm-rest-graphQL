@@ -21,7 +21,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        this.logger.debug(`Here is the ${payload}`);
-        return await this.userRepository.findBy({ id: payload.sub });
+        this.logger.debug(`Here is the ${JSON.stringify(payload)}`);
+        const user = await this.userRepository.findBy({ id: payload.sub });
+        this.logger.debug(`Here is the user ${JSON.stringify(user)}`);
+        return user;
     }
 }

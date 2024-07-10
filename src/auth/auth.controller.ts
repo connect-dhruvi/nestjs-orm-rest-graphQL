@@ -16,7 +16,7 @@ export class AuthController {
     async login(@CurrentUser() user: User) {
         return {
             userId: user.id,
-            token: this.authService.getTokenForUser(request.user)
+            token: this.authService.getTokenForUser(user)
         }
     }
 
@@ -31,7 +31,7 @@ export class AuthController {
     @Get('profile')
     @UseGuards(AuthGuard('jwt'))
     async getProfile(@CurrentUser() user) {
-        return user.user;
+        return user;
     }
 
 
