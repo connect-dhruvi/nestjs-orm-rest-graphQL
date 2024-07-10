@@ -3,6 +3,8 @@ import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "./current-user.decorator";
 import { User } from "./user.entity";
+import { AuthGuardLocal } from "./input/auth-guard.local";
+import { AuthGuardJwt } from "./input/auth-guard.jwt";
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +14,7 @@ export class AuthController {
 
 
     @Post('login')
-    @UseGuards(AuthGuard('local'))
+    @UseGuards(AuthGuardLocal)
     async login(@CurrentUser() user: User) {
         return {
             userId: user.id,
@@ -29,7 +31,7 @@ export class AuthController {
 
     // - After that, you'll need to fill the "Secret" input with your secret key ("secret123" in this course) and in the "Payload" input write { "token": "THE TOKEN YOU COPIED FROM YOUR USER OBJECT"}
     @Get('profile')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuardJwt)
     async getProfile(@CurrentUser() user) {
         return user;
     }
