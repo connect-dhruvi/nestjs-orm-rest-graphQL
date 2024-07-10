@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CreateEventDto } from "./input/create-event.dto";
 import { Event } from './event.entity';
 import { InjectRepository } from "@nestjs/typeorm";
@@ -9,6 +9,7 @@ import { ListEvents, WhenEventFilter } from "./input/list.events";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { User } from "src/auth/user.entity";
 import { AuthGuardJwt } from "src/auth/input/auth-guard.jwt";
+import { UpdateEventDto } from "./input/update-event.dto";
 
 
 @Controller('/events')
@@ -106,41 +107,47 @@ export class EventsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id,
-    @Body()
-    input: CreateEventDto) {
-    const event = await this.repository.findOne({ where: { id: id } });
+  @UseGuards(AuthGuardJwt)
+  async update(
+    @Param('id') id,
+    @Body() input: UpdateEventDto,
+    @CurrentUser() user: User
+  ) {
+    const event = await this.eventsService.getEvent(id);
 
     if (!event) {
       throw new NotFoundException();
     }
 
-    return await this.repository.save({
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null, `You are not authorized to change this event`
+      );
+    }
 
-      ...event,
-      ...input,
-      when: input.when ? new Date(input.when) : event.when
-    });
-
+    return await this.eventsService.updateEvent(event, input);
   }
 
-  @HttpCode(204)
+
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    //this.events = this.events.filter(event => event.id !== parseInt(id));
+  @UseGuards(AuthGuardJwt)
+  @HttpCode(204)
+  async remove(
+    @Param('id') id,
+    @CurrentUser() user: User
+  ) {
+    const event = await this.eventsService.getEvent(id);
 
-    // const event = await this.repository.findOne({ where: { id: id } }); // This line expects 'id' to be a selection condition
-    // if (!event) {
-    //   throw new NotFoundException(`Event with ID ${id} not found`);
-    // }
-
-    // await this.repository.remove(event);
-    // return { message: `Event with ID ${id} has been deleted` };
-
-
-    const result = this.eventsService.deleteEvent(id);
-    if ((await result)?.affected !== 1) {
-      throw new NotFoundException(`Event with ID ${id} not found`);
+    if (!event) {
+      throw new NotFoundException();
     }
+
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null, `You are not authorized to remove this event`
+      );
+    }
+
+    await this.eventsService.deleteEvent(id);
   }
 }
