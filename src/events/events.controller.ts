@@ -30,13 +30,12 @@ export class EventsController {
   @UseInterceptors(ClassSerializerInterceptor)
   async findAll(@Query() filter: ListEvents) {
     this.logger.debug(filter);
-    this.logger.log('Hit the get all endpoint')
     const events = await this.eventsService.getEventsWithAttendeeCountFilteredPaginated(
       filter,
       {
         total: true,
         currentPage: filter.page,
-        limit: 2
+        limit: 5
       });
 
     return events;
