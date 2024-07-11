@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
+import { ClassSerializerInterceptor, Controller, Get, Post, Request, SerializeOptions, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "./current-user.decorator";
@@ -7,6 +7,7 @@ import { AuthGuardLocal } from "./input/auth-guard.local";
 import { AuthGuardJwt } from "./input/auth-guard.jwt";
 
 @Controller('auth')
+@SerializeOptions({ strategy: 'excludeAll' })
 export class AuthController {
 
     constructor
@@ -32,6 +33,7 @@ export class AuthController {
     // - After that, you'll need to fill the "Secret" input with your secret key ("secret123" in this course) and in the "Payload" input write { "token": "THE TOKEN YOU COPIED FROM YOUR USER OBJECT"}
     @Get('profile')
     @UseGuards(AuthGuardJwt)
+    @UseInterceptors(ClassSerializerInterceptor)
     async getProfile(@CurrentUser() user) {
         return user;
     }

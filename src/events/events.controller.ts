@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, SerializeOptions, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CreateEventDto } from "./input/create-event.dto";
 import { Event } from './event.entity';
 import { InjectRepository } from "@nestjs/typeorm";
@@ -10,9 +10,11 @@ import { CurrentUser } from "src/auth/current-user.decorator";
 import { User } from "src/auth/user.entity";
 import { AuthGuardJwt } from "src/auth/input/auth-guard.jwt";
 import { UpdateEventDto } from "./input/update-event.dto";
+import { Strategy } from 'passport-local';
 
 
 @Controller('/events')
+@SerializeOptions({ strategy: 'excludeAll' })
 export class EventsController {
   private readonly logger = new Logger(EventsController.name);
   constructor(
@@ -25,6 +27,7 @@ export class EventsController {
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseInterceptors(ClassSerializerInterceptor)
   async findAll(@Query() filter: ListEvents) {
     this.logger.debug(filter);
     this.logger.log('Hit the get all endpoint')
@@ -83,6 +86,7 @@ export class EventsController {
 
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param('id', ParseIntPipe) id) {
 
     //  const event = this.events.find(event => event.id === parseInt(id));
@@ -100,6 +104,7 @@ export class EventsController {
 
   @Post()
   @UseGuards(AuthGuardJwt)
+  @UseInterceptors(ClassSerializerInterceptor)
   async create(
     @Body() input: CreateEventDto,
     @CurrentUser() user: User) {
@@ -108,6 +113,7 @@ export class EventsController {
 
   @Patch(':id')
   @UseGuards(AuthGuardJwt)
+  @UseInterceptors(ClassSerializerInterceptor)
   async update(
     @Param('id') id,
     @Body() input: UpdateEventDto,
