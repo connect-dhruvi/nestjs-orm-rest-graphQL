@@ -117,7 +117,7 @@ export class EventsService {
   }
 
   public async findOne(id: number): Promise<Event | undefined> {
-    return await this.eventsRepository.findOne(id);
+    return await this.eventsRepository.findOne({ where: { id: id } });
   }
 
   public async createEvent(

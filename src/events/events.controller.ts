@@ -1,11 +1,11 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, SerializeOptions, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
-import { AuthGuardJwt } from "src/auth/auth-guard.jwt";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { User } from "src/auth/user.entity";
 import { EventsService } from "./events.service";
 import { CreateEventDto } from './input/create-event.dto';
 import { ListEvents } from "./input/list.events";
 import { UpdateEventDto } from "./input/update-event.dto";
+import { AuthGuardJwt } from './../auth/input/auth-guard.jwt';
 
 @Controller('/events')
 @SerializeOptions({ strategy: 'excludeAll' })
