@@ -1,11 +1,15 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Attendee } from "./attendee.entity";
-import { User } from "src/auth/user.entity";
 import { Expose } from "class-transformer";
+import { User } from "src/auth/user.entity";
 import { PaginationResult } from "src/pagination/paginator";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Attendee } from "./attendee.entity";
 
 @Entity()
 export class Event {
+  constructor(partial?: Partial<Event>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn()
   @Expose()
   id: number;
@@ -14,38 +18,39 @@ export class Event {
   @Expose()
   name: string;
 
-  @Column({ nullable: true })
+  @Column()
   @Expose()
   description: string;
 
-  @Column({ nullable: true })
+  @Column()
   @Expose()
   when: Date;
 
-  @Column({ nullable: true })
+  @Column()
   @Expose()
   address: string;
 
-  @OneToMany(() => Attendee, (attendee) => attendee.event,
-    // {
-    //   eager: true
-    // }
-  )
+  @OneToMany(() => Attendee, (attendee) => attendee.event, {
+    cascade: true
+  })
+  @Expose()
   attendees: Attendee[];
 
   @ManyToOne(() => User, (user) => user.organized)
-  @JoinColumn({ name: 'organizerId' })
+  @Expose()
   organizer: User;
 
-  @Expose()
   @Column({ nullable: true })
   organizerId: number;
 
+  @Expose()
   attendeeCount?: number;
+  @Expose()
   attendeeRejected?: number;
+  @Expose()
   attendeeMaybe?: number;
+  @Expose()
   attendeeAccepted?: number;
-
 }
 
 export type PaginatedEvents = PaginationResult<Event>;
