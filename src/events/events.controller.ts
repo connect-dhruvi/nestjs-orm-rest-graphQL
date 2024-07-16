@@ -1,6 +1,6 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, SerializeOptions, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
-import { CurrentUser } from "src/auth/current-user.decorator";
-import { User } from "src/auth/user.entity";
+import { CurrentUser } from "../auth/current-user.decorator";
+import { User } from "../auth/user.entity";
 import { EventsService } from "./events.service";
 import { CreateEventDto } from './input/create-event.dto';
 import { ListEvents } from "./input/list.events";

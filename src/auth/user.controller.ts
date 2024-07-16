@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Logger, Post } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AuthService } from "./auth.service";
@@ -7,10 +7,12 @@ import { User } from "./user.entity";
 
 @Controller('users')
 export class UsersController {
+    private readonly logger = new Logger(UsersController.name)
+
     constructor(
         private readonly authService: AuthService,
         @InjectRepository(User)
-        private readonly userRepository: Repository<User>
+        private readonly userRepository: Repository<User>,
     ) { }
 
     @Post()
@@ -18,6 +20,7 @@ export class UsersController {
         const user = new User();
 
         if (createUserDto.password !== createUserDto.retypePassword) {
+            this.logger.debug(createUserDto.password, createUserDto.retypePassword)
             throw new BadRequestException(['Passwords are not identical']);
         }
 
