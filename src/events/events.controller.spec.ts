@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Event } from "./event.entity";
 import { ListEvents } from "./input/list.events";
 import { NotFoundException } from "@nestjs/common";
-import { User } from "src/auth/user.entity";
+import { User } from "../auth/user.entity";
 
 describe('EventsController', () => {
     let eventsService: EventsService;
