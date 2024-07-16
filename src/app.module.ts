@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -13,7 +13,9 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [ormConfig]
+      load: [ormConfig],
+      expandVariables: true,
+      envFilePath: `${process.env.NODE_ENV}`.trim() + ".env",
     }),
     TypeOrmModule.forRootAsync({
       useFactory: ormConfig
@@ -28,4 +30,10 @@ import { AuthModule } from './auth/auth.module';
     useClass: AppService
   }]
 })
-export class AppModule { }
+export class AppModule {
+  private readonly logger = new Logger(AppModule.name);
+  constructor() {
+
+      this.logger.debug(`${process.env.NODE_ENV}.env`.trim());
+    }
+ }
